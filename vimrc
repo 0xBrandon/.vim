@@ -19,8 +19,8 @@ nnoremap <leader>b :source $MYVIMRC<CR>
 """""""""""""""""""""
 " Font
 """""""""""""""""""""
-set guifont=Fira :h14   " MacOS
-"set guifont=Monaco\ 14 " Other flavors of Linux
+set guifont=Fira\ Code:h14  " MacOS
+"set guifont=Monaco\ 14     " Other flavors of Linux
 
 """""""""""""""""""""
 " LEADER SHORTCUTS
