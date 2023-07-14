@@ -17,6 +17,12 @@ filetype indent on      " load filetype-specific indent files
 nnoremap <leader>b :source $MYVIMRC<CR>
 
 """""""""""""""""""""
+" Font
+"""""""""""""""""""""
+set guifont=Fira :h14   " MacOS
+"set guifont=Monaco\ 14 " Other flavors of Linux
+
+"""""""""""""""""""""
 " LEADER SHORTCUTS
 """""""""""""""""""""
 let mapleader=","       " leader is comma
@@ -241,15 +247,6 @@ nnoremap <leader>s :call TrimEndLines()<CR>
 " Addon Settings
 """""""""""""""""""""
 " Below are configuration setings for addons
-
-"""""""""""""""""""""
-" CtrlP
-"""""""""""""""""""""
-" CtrlP settings
-" let g:ctrlp_match_window = 'bottom,order:ttb'
-" let g:ctrlp_switch_buffer = 0
-" let g:ctrlp_working_path_mode = 0
-" let g:ctrlp_user_command = 'ag %s -l --nocolor --hidden -g ""'
 
 """""""""""""""""""""
 " UNDOTREE
