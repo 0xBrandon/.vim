@@ -202,7 +202,7 @@ au BufNewFile,BufRead *.vim setlocal expandtab sw=2 sts=2
 au BufNewFile,BufRead *.txt setlocal expandtab spell sw=2 sts=2
 au BufNewFile,BufRead *.yml setlocal expandtab spell sw=2 sts=2
 au BufNewFile,BufRead *.md setlocal expandtab spell sw=2 sts=2
-au BufNewFile,BufRead *.py setlocal expandtab spell sw=4 sts=4
+au BufNewFile,BufRead *.py setlocal expandtab spell sw=2 sts=2
 au BufNewFile,BufRead *.ex setlocal expandtab spell sw=2 sts=2
 
 """"""""""""""""""""
