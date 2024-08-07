@@ -34,7 +34,7 @@ let g:mapleader=","
 set t_Co=256            " set terminal to terminal to 256color mode
 syntax enable           " enable syntax processing
 set background=dark     " dark background
-colorscheme gruvbox     " coloscheme
+colorscheme one         " coloscheme
 
 """""""""""""""""""""
 " SPACES & TABS & LINES
