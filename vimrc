@@ -19,7 +19,7 @@ nnoremap <leader>b :source $MYVIMRC<CR>
 """""""""""""""""""""
 " Font
 """""""""""""""""""""
-set guifont=Fira\ Code:h14  " MacOS
+set guifont=JetBrains\ Mono:h14  " MacOS
 "set guifont=Monaco\ 14     " Other flavors of Linux
 
 """""""""""""""""""""
