@@ -235,7 +235,7 @@ fun! TrimEndLines()
 endfun
 
 " bind ToggleNumber function
-nnoremap <leader>n :call ToggleNumber()<cr>
+nnoremap <leader>n :call ToggleNumber()<CR>
 
 " bind StripWhitespaces() function
 nnoremap <leader>w :call StripWhitespaces()<CR>
