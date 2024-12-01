@@ -1,1 +1,64 @@
+# vim-plug installation directory
+plugged/
+
+# Swap files
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Persistent undo
+undo/
+
+# Session
+Session.vim
+Sessionx.vim
+
+# Temporary
+.netrwhist
+*~
+
+# Auto-generated tag files
+tags
+tags.*
+
+# Backup files
+backup/
+*.bak
+*.backup
+
+# macOS system files
 .DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# IDE specific files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+
+# Windows specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux specific
+.directory
+.Trash-*
+
+# Plugin specific
+.vim-bookmarks
+.vim-fuf-data
+.vim-temp/
+
+# Local configuration
+.vimrc.local
