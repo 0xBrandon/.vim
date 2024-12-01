@@ -1,17 +1,23 @@
-
 """""""""""""""""""""
 " LAUNCH CONFIG
 """""""""""""""""""""
-execute pathogen#infect()
-call pathogen#helptags()
+" Auto-install vim-plug
+if empty(glob('~/.vim/autoload/plug.vim'))
+  silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+    \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+  autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
+
+" Initialize plugins
+call plug#begin('~/.vim/plugged')
+" Your plugins would go here
+call plug#end()
 
 set encoding=utf-8      " set default encoding to UTF-8
 set nocompatible        " vim is not vi compatible
 set autochdir           " use the current file's dir as the working dir
 
-filetype off            " turn off filetype detection
-filetype indent on      " load filetype-specific indent files
-                        " also turns on filetype detection
+filetype plugin indent on  " Enable detection, plugins, and indenting in one step
 
 " A shortcut to source .vimrc
 nnoremap <leader>b :source $MYVIMRC<CR>
@@ -32,6 +38,9 @@ let g:mapleader=","
 " COLORS
 """""""""""""""""""""
 set t_Co=256            " set terminal to terminal to 256color mode
+if exists('+termguicolors')
+  set termguicolors     " Enable true color support
+endif
 syntax enable           " enable syntax processing
 set background=dark     " dark background
 colorscheme gruvbox     " coloscheme
@@ -84,27 +93,22 @@ set lazyredraw          " redraw only when we need to
 set showmatch           " highlight matching [{()}]
 set cursorline          " highlight current line
 set history=700         " Sets how many lines of history VIM has to remember
+set updatetime=300      " Faster completion
+set timeoutlen=500      " Faster key sequence completion
 
 " toggle spell checking
 map <leader>ss :setlocal spell!<cr>
 
 """"""""""""""""""""
-" STATUS LINE (Not using)
+" STATUS LINE
 """""""""""""""""""""
-" set statusline=%t[%{strlen(&fenc)?&fenc:'none'},%{&ff}]%h%m%r%y%=%c,%l/%L\ %P
-
-" EXAMPLE status line tags
-" set statusline=%t                                 "tail of the filename
-" set statusline+=[%{strlen(&fenc)?&fenc:'none'},   "file encoding
-" set statusline+=%{&ff}]                           "file format
-" set statusline+=%h                                "help file flag
-" set statusline+=%m                                "modified flag
-" set statusline+=%r                                "read only flag
-" set statusline+=%y                                "filetype
-" set statusline+=%=                                "left/right separator
-" set statusline+=%c,                               "cursor column
-" set statusline+=%l/%L                             "cursor line/total lines
-" set statusline+=\ %P                              "percent through file
+set statusline=%t                                   "tail of the filename
+set statusline+=[%{strlen(&fenc)?&fenc:'none'},%{&ff}]  "file encoding
+set statusline+=%h%m%r%y                           "flags
+set statusline+=%=                                 "left/right separator
+set statusline+=%c,                                "cursor column
+set statusline+=%l/%L                              "cursor line/total lines
+set statusline+=\ %P                               "percent through file
 
 """"""""""""""""""""
 " WILDMENU SETTINGS
@@ -126,8 +130,9 @@ set hlsearch            " Highlight matches
 set ignorecase          " Ignore case while searching
 set smartcase           " Use case in search patterns
 
-" set complete-=i       " Tell autocomplete where to look
-" set complete=.,w,b,u,t
+if executable('rg')
+    set grepprg=rg\ --vimgrep\ --smart-case\ --follow
+endif
 
 " leader followed by space will turn off search highlight
 nnoremap <leader><space> :nohlsearch<CR>
@@ -149,17 +154,16 @@ nnoremap <leader><space> :nohlsearch<CR>
 map <Up> gk
 map <Down> gj
 
-" Move arounds line visually, don't skip over wrapped lines
-" nnoremap j gj
-" nnoremap k gk
-
 " Move by virtual lines when used without a count
 " Move by physical lines when used with a count
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
 noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 
-" highlight last inserted text
-" nnoremap gV `[v`]
+" Better window navigation
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
 
 """"""""""""""""""""
 " AUTOGROUPS
@@ -184,26 +188,25 @@ set noswapfile          " Don't use swapfile
 set nobackup            " Don't create backups
 set nowritebackup       " Don't write backups
 
+" Persistent undo
+if has('persistent_undo')
+    set undofile
+    set undodir=~/.vim/undo
+endif
+
 " Don't save .netrwhist history
 let g:netrw_dirhistmax=0
 
 """"""""""""""""""""
 " FILE TYPE SETTINGS
 """""""""""""""""""""
-au BufNewFile,BufRead *.java setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.rs setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.html setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.css setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.js setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.cpp setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.c setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.json setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.vim setlocal expandtab sw=2 sts=2
-au BufNewFile,BufRead *.txt setlocal expandtab spell sw=2 sts=2
-au BufNewFile,BufRead *.yml setlocal expandtab spell sw=2 sts=2
-au BufNewFile,BufRead *.md setlocal expandtab spell sw=2 sts=2
-au BufNewFile,BufRead *.py setlocal expandtab spell sw=2 sts=2
-au BufNewFile,BufRead *.ex setlocal expandtab spell sw=2 sts=2
+augroup FileTypeSpecific
+    autocmd!
+    autocmd FileType java,javascript,html,css,json,vim,rust,c,cpp setlocal expandtab sw=2 sts=2
+    autocmd FileType python setlocal expandtab sw=4 sts=4
+    autocmd FileType go setlocal noexpandtab ts=4 sw=4
+    autocmd FileType markdown,yaml setlocal expandtab sw=2 sts=2 spell
+augroup END
 
 """"""""""""""""""""
 " CUSTOM FUNCTIONS
@@ -227,11 +230,12 @@ function! ToggleNumber()
 endfunc
 
 " This function will trim blank lines at the end of files
-" This function is called on buffer write in the autogroup above
 fun! TrimEndLines()
     let save_cursor = getpos(".")
+    let old_query = getreg('/')
     silent! %s#\($\n\s*\)\+\%$##
     call setpos('.', save_cursor)
+    call setreg('/', old_query)
 endfun
 
 " bind ToggleNumber function
