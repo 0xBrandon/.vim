@@ -27,6 +27,7 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set nocompatible                   " Vim not vi
 set encoding=utf-8                 " UTF-8 encoding
+set fileencoding=utf-8             " Write files as UTF-8
 let mapleader = ","                " Set leader key
 
 " Auto-install vim-plug
@@ -47,6 +48,7 @@ Plug 'airblade/vim-gitgutter'            " Git changes in gutter
 Plug 'preservim/nerdtree'                " File explorer
 Plug 'mbbill/undotree'                   " Undo visualization
 Plug 'vim-airline/vim-airline'           " Status line
+Plug 'vim-airline/vim-airline-themes'    " Airline themes
 Plug 'dense-analysis/ale'                " Async linting engine
 Plug 'jiangmiao/auto-pairs'              " Auto pair brackets
 Plug 'tpope/vim-surround'                " Surround text objects
@@ -77,7 +79,7 @@ Plug 'ap/vim-css-color'                  " Color previews
 Plug 'elzr/vim-json'                     " JSON support
 Plug 'cespare/vim-toml'                  " TOML support
 Plug 'plasticboy/vim-markdown'           " Markdown support
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
+Plug 'iamcco/markdown-preview.vim'
 
 " Snippets
 Plug 'honza/vim-snippets'                " Snippet collection
@@ -106,7 +108,6 @@ if has('termguicolors')
 endif
 
 " --- ALE Configuration ---
-" CoC owns LSP (diagnostics, completion, hover). ALE handles non-LSP linters only.
 let g:ale_disable_lsp = 1
 
 let g:ale_linters = {
@@ -136,18 +137,15 @@ let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
 " --- CoC Configuration ---
 let g:coc_global_extensions = [
     \ 'coc-json',
-    \ 'coc-git',
     \ 'coc-pyright',
     \ 'coc-rust-analyzer',
     \ 'coc-tsserver',
     \ 'coc-html',
     \ 'coc-css',
-    \ 'coc-prettier',
     \ 'coc-go',
     \ ]
 
 " --- vim-go Configuration ---
-" go_fmt_autosave disabled: CoC-go owns formatting via coc-go.
 let g:go_fmt_autosave = 0
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
@@ -155,10 +153,9 @@ let g:go_highlight_fields = 1
 let g:go_highlight_types = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_build_constraints = 1
-let g:go_fmt_command = "goimports"
 let g:go_auto_type_info = 1
 let g:go_addtags_transform = "camelcase"
-let g:go_auto_sameids = 1
+let g:go_auto_sameids = 0
 
 " --- FZF Configuration ---
 let g:fzf_history_dir = '~/.local/share/fzf-history'
@@ -179,7 +176,6 @@ let g:fzf_colors = {
 \ 'header':  ['fg', 'Comment'] }
 
 " --- vim-rooter Configuration ---
-" Anchors cwd to project root (.git, go.mod, Cargo.toml, etc.)
 let g:rooter_patterns = ['.git', 'go.mod', 'Cargo.toml', 'package.json', 'pyproject.toml', 'setup.py']
 let g:rooter_silent_chdir = 1
 
@@ -207,6 +203,7 @@ let g:airline_highlighting_cache = 1
 let g:airline_extensions = ['branch', 'tabline']
 let g:airline#extensions#ale#enabled = 1
 let g:airline#extensions#coc#enabled = 1
+let g:airline_theme = 'gruvbox_material'
 
 let g:airline_left_sep = ''
 let g:airline_left_alt_sep = ''
@@ -246,7 +243,6 @@ let g:undotree_WindowLayout = 2
 filetype plugin indent on           " Enable file type detection
 set hidden                          " Allow hidden buffers
 set autoread                        " Auto reload changed files
-" autochdir removed: vim-rooter handles cwd, scoped to project root not buffer dir
 set history=700                     " Command history
 set updatetime=300                  " Faster completion
 set timeoutlen=500                  " Faster key sequence completion
@@ -282,7 +278,7 @@ set cursorline                      " Highlight current line
 set noerrorbells                    " No bells
 set signcolumn=yes                  " Always show sign column
 set laststatus=2                    " Always show status line
-set ruler                           " Show cursor position
+set noruler                         " Airline renders position
 
 " --- Colors and Fonts ---
 syntax enable                       " Enable syntax processing
@@ -307,7 +303,7 @@ set splitright                      " Split vertical windows right
 set splitbelow                      " Split horizontal windows below
 
 " --- Text Display ---
-set textwidth=80                    " Line wrap at 80 chars
+set textwidth=0                     " Disable auto line-wrap globally (set per filetype for prose)
 set formatoptions=qrn1
 set colorcolumn=80                  " Highlight column 80
 highlight OverLength ctermbg=red ctermfg=white guibg=#592929
@@ -315,7 +311,7 @@ match OverLength /\%81v.\+/
 
 " --- Completion ---
 set wildmenu                        " Visual command-line completion
-set wildmode=list:full              " Command completion mode
+set wildmode=list:full             " Command completion mode
 set shortmess+=c                    " Don't pass messages to completion menu
 
 " --- Wild Ignore Patterns ---
@@ -361,7 +357,17 @@ nmap <silent> gd <Plug>(coc-definition)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gr <Plug>(coc-references)
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+nmap <leader>rn <Plug>(coc-rename)
+nmap <leader>ac <Plug>(coc-codeaction)
+nmap <leader>qf <Plug>(coc-fix-current)
 nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+" --- Buffer Navigation ---
+nnoremap <leader>] :bnext<CR>
+nnoremap <leader>[ :bprevious<CR>
+nnoremap <leader>x :bdelete<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Custom Functions
@@ -423,9 +429,6 @@ augroup configgroup
     " Clear sign column highlight
     autocmd VimEnter * highlight clear SignColumn
 
-    " Trim whitespace and blank lines on save for specific file types
-    autocmd BufWritePre *.py,*.js,*.java,*.html,*.css,*.json,*.c,*.cpp,*.rs,*.ex,*.vim,*.txt,*.yml,*.md,*.go :call TrimEndLines()
-
     " Auto save on focus lost
     autocmd FocusLost * :wa
 augroup END
@@ -467,7 +470,7 @@ augroup FileTypeSpecific
 
     " Documentation files (2 spaces with spell check)
     autocmd FileType markdown,md,yaml
-        \ setlocal expandtab shiftwidth=2 softtabstop=2 spell
+        \ setlocal expandtab shiftwidth=2 softtabstop=2 spell textwidth=80
 augroup END
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
