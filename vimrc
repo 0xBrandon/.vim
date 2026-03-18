@@ -148,7 +148,6 @@ let g:coc_global_extensions = [
 
 " --- vim-go Configuration ---
 " go_fmt_autosave disabled: CoC-go owns formatting via coc-go.
-" Keeping vim-go for syntax highlighting and test generation only.
 let g:go_fmt_autosave = 0
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
@@ -316,7 +315,7 @@ match OverLength /\%81v.\+/
 
 " --- Completion ---
 set wildmenu                        " Visual command-line completion
-set wildmode=list:full             " Command completion mode
+set wildmode=list:full              " Command completion mode
 set shortmess+=c                    " Don't pass messages to completion menu
 
 " --- Wild Ignore Patterns ---
