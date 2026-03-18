@@ -1,7 +1,7 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim Configuration
 " Maintainer: Brandon Hill
-" Last Updated: 12-01-2024
+" Last Updated: 03-17-2026
 "
 " Sections:
 " -> Initial Setup
@@ -53,6 +53,7 @@ Plug 'tpope/vim-surround'                " Surround text objects
 Plug 'tpope/vim-commentary'              " Easy commenting
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 Plug 'junegunn/fzf.vim'
+Plug 'airblade/vim-rooter'               " Project root detection
 
 " Language Support
 Plug 'neoclide/coc.nvim', {'branch': 'release'}  " Completion engine
@@ -82,16 +83,8 @@ Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
 Plug 'honza/vim-snippets'                " Snippet collection
 
 " Themes
-Plug 'sainnhe/gruvbox-material'          " Modern gruvbox
-Plug 'shaunsingh/nord.nvim'              " Enhanced Nord
+Plug 'sainnhe/gruvbox-material'          " Modern gruvbox (active)
 Plug 'rakr/vim-one'                      " One Dark/Light
-Plug 'Mofiqul/dracula.nvim'              " Enhanced Dracula
-Plug 'lifepillar/vim-solarized8'         " Modern Solarized
-Plug 'tomasr/molokai'                    " Molokai
-Plug 'challenger-deep-theme/vim'         " Challenger Deep
-Plug 'bluz71/vim-nightfly-guicolors'     " Nightfly
-Plug 'ayu-theme/ayu-vim'                 " Ayu
-Plug 'sainnhe/edge'                      " Edge
 Plug 'cocopon/iceberg.vim'               " Iceberg
 
 call plug#end()
@@ -103,7 +96,6 @@ call plug#end()
 " --- Theme Configuration ---
 let g:gruvbox_material_background = 'medium'
 let g:gruvbox_material_better_performance = 1
-let ayucolor="dark"
 let g:one_allow_italics = 1
 
 " Terminal color support
@@ -114,11 +106,13 @@ if has('termguicolors')
 endif
 
 " --- ALE Configuration ---
+" CoC owns LSP (diagnostics, completion, hover). ALE handles non-LSP linters only.
+let g:ale_disable_lsp = 1
+
 let g:ale_linters = {
 \   'python': ['flake8', 'pylint'],
 \   'javascript': ['eslint'],
-\   'typescript': ['tsserver', 'eslint'],
-\   'go': ['gopls'],
+\   'typescript': ['eslint'],
 \   'rust': ['analyzer'],
 \}
 
@@ -153,6 +147,9 @@ let g:coc_global_extensions = [
     \ ]
 
 " --- vim-go Configuration ---
+" go_fmt_autosave disabled: CoC-go owns formatting via coc-go.
+" Keeping vim-go for syntax highlighting and test generation only.
+let g:go_fmt_autosave = 0
 let g:go_highlight_functions = 1
 let g:go_highlight_function_calls = 1
 let g:go_highlight_fields = 1
@@ -181,6 +178,11 @@ let g:fzf_colors = {
 \ 'marker':  ['fg', 'Keyword'],
 \ 'spinner': ['fg', 'Label'],
 \ 'header':  ['fg', 'Comment'] }
+
+" --- vim-rooter Configuration ---
+" Anchors cwd to project root (.git, go.mod, Cargo.toml, etc.)
+let g:rooter_patterns = ['.git', 'go.mod', 'Cargo.toml', 'package.json', 'pyproject.toml', 'setup.py']
+let g:rooter_silent_chdir = 1
 
 " --- NERDTree Configuration ---
 let g:NERDTreeShowHidden = 1
@@ -245,7 +247,7 @@ let g:undotree_WindowLayout = 2
 filetype plugin indent on           " Enable file type detection
 set hidden                          " Allow hidden buffers
 set autoread                        " Auto reload changed files
-set autochdir                       " Auto change directory to file location
+" autochdir removed: vim-rooter handles cwd, scoped to project root not buffer dir
 set history=700                     " Command history
 set updatetime=300                  " Faster completion
 set timeoutlen=500                  " Faster key sequence completion
@@ -275,7 +277,7 @@ endif
 set number                          " Show line numbers
 set relativenumber                  " Relative line numbers
 set showcmd                         " Show command in bottom bar
-set showmode                        " Show current mode
+set noshowmode                      " Airline renders mode — built-in indicator redundant
 set showmatch                       " Highlight matching brackets
 set cursorline                      " Highlight current line
 set noerrorbells                    " No bells
@@ -329,7 +331,7 @@ set wildignore+=*.orig
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " --- General Mappings ---
 nnoremap <leader>b :source $MYVIMRC<CR>
-map <leader>ss :setlocal spell!<cr>
+nnoremap <leader>ss :setlocal spell!<cr>
 nnoremap <leader><space> :nohlsearch<CR>
 
 " --- Plugin Mappings ---
@@ -345,8 +347,8 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
 " --- Movement ---
-map <Up> gk
-map <Down> gj
+noremap <Up> gk
+noremap <Down> gj
 noremap <silent> <expr> j (v:count == 0 ? 'gj' : 'j')
 noremap <silent> <expr> k (v:count == 0 ? 'gk' : 'k')
 
@@ -411,7 +413,7 @@ endfunction
 " Function key bindings
 nnoremap <leader>n :call ToggleNumber()<CR>
 nnoremap <leader>w :call StripWhitespaces()<CR>
-nnoremap <leader>s :call TrimEndLines()<CR>
+nnoremap <leader>e :call TrimEndLines()<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " => Auto Commands
@@ -465,7 +467,7 @@ augroup FileTypeSpecific
         \ setlocal noexpandtab tabstop=4 shiftwidth=4
 
     " Documentation files (2 spaces with spell check)
-    autocmd FileType markdown,yaml
+    autocmd FileType markdown,md,yaml
         \ setlocal expandtab shiftwidth=2 softtabstop=2 spell
 augroup END
 
